@@ -1,41 +1,27 @@
-# Continuous Documentation
+# Cursor Team Plugins
 
-Cursor plugin that keeps the repository `readme.md` current by mining conversation transcripts for documentation-worthy changes.
+Team marketplace repository for Cursor IDE plugins. Import this repository as a team marketplace on the Cursor Teams or Enterprise plan.
 
-## How it works
+## Setup
 
-A `stop` hook tracks conversation cadence. When thresholds are met, it triggers the `continuous-documentation` skill, which:
+1. Go to **Dashboard > Settings > Plugins**.
+2. Under **Team Marketplaces**, click **Import**.
+3. Paste this repository's URL and continue.
+4. Review the listed plugins and assign distribution groups.
+5. Set each plugin as **Required** (auto-installed) or **Optional** per group.
 
-1. Reads the current `readme.md`.
-2. Processes new or changed transcript files (incremental — skips already-processed ones).
-3. Extracts documentation-worthy changes: new features, design decisions, architectural shifts, business logic.
-4. Captures the *why* behind changes from conversation context.
-5. Updates the README following embedded structure guidelines (Service, Monolith, UI, or Package).
-6. Strips AI filler language before writing.
+## Plugins
 
-## State files
+| Plugin | Description |
+|--------|-------------|
+| [continuous-documentation](./continuous-documentation/) | Keeps repository README.md current by mining conversation transcripts for documentation-worthy changes. |
 
-The hook writes cadence state to `.cursor/hooks/state/continuous-documentation.json` in the workspace.
-The skill writes an incremental transcript index to `.cursor/hooks/state/continuous-documentation-index.json`.
+## Adding a new plugin
 
-## Trigger cadence
-
-| Setting | Default | Trial mode |
-|---------|---------|------------|
-| Minimum turns | 10 | 3 |
-| Minimum minutes | 120 | 15 |
-| Trial duration | — | 24 hours |
-
-Transcript mtime must advance since the previous run.
-
-## Env overrides
-
-- `CONTINUOUS_DOCUMENTATION_MIN_TURNS`
-- `CONTINUOUS_DOCUMENTATION_MIN_MINUTES`
-- `CONTINUOUS_DOCUMENTATION_TRIAL_MODE`
-- `CONTINUOUS_DOCUMENTATION_TRIAL_MIN_TURNS`
-- `CONTINUOUS_DOCUMENTATION_TRIAL_MIN_MINUTES`
-- `CONTINUOUS_DOCUMENTATION_TRIAL_DURATION_MINUTES`
+1. Create a new directory at the root named after your plugin (kebab-case).
+2. Add a `.cursor-plugin/plugin.json` manifest inside it.
+3. Add your skills, hooks, rules, or other components.
+4. Register the plugin in `.cursor-plugin/marketplace.json` under the `plugins` array.
 
 ## License
 

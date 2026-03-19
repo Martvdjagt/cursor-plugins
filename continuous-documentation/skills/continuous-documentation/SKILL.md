@@ -5,21 +5,17 @@ description: Incrementally update the repository README.md by combining actual c
 
 # Continuous Documentation
 
-Keep the repository `readme.md` current using two sources of truth:
+Keep the repository `readme.md` up-to-date using two sources of truth:
 - **Git** tells you what changed.
 - **Transcripts** tell you why it changed.
-
-Both matter equally. This skill is self-contained — all documentation guidelines are embedded below.
 
 ## Core Principles
 
 ### 1. What and Why are equally important
 
-"What" lives in the code — new files, changed signatures, added endpoints, altered domain logic. Use `git log` and `git diff` to find it.
+"What" lives in the code — The current state. Data flow, domain logic, data contracts. Use `git log` and `git diff` to find it. 
 
-"Why" lives in the conversation — the user's stated reasoning, rejected alternatives, constraints that shaped the decision. Use transcripts to find it.
-
-A README entry that states what changed without why is a changelog line. A README entry that states why without what is an orphaned rationale. Neither is useful alone.
+"Why" lives in the conversation — Design Choices: the user's stated reasoning, rejected alternatives, constraints that shaped the decision. Use transcripts to find it and describe why it was designed as such.
 
 ### 2. What NOT to include is equally important as what to include
 
@@ -163,14 +159,10 @@ Document NFRs only when they significantly impact design, operations, or user ex
 
 This list carries the same weight as the one above. Enforce it.
 
-- Restatements of what the code already says. If the function is `CalculateShippingCost`, do not document "calculates the shipping cost."
-- Implementation details that change frequently (file paths, class names, method signatures) unless they are public API surface.
-- Setup instructions that belong in a wiki or onboarding guide, not a README.
 - Auto-generated changelogs or version histories. The README is not a changelog.
 - Anything that only matters during a single sprint or PR cycle.
 - Internal ticket numbers, branch names, or developer names.
-- A "what" without substance. If the change is a routine refactor or rename, it does not belong in the README regardless of how many files it touched.
-- A "why" without a corresponding meaningful "what". Intent behind trivial changes is still trivial.
+- Repeated content
 
 ## Slop Filter
 

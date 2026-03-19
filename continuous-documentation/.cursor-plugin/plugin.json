@@ -6,6 +6,7 @@
     "name": "mvanderjagt"
   },
   "license": "MIT",
+  "repository": "https://github.com/mvanderjagt/cursor-plugin-continuous-documentation",
   "keywords": [
     "continuous-documentation",
     "readme",
@@ -13,12 +14,7 @@
     "hooks",
     "incremental"
   ],
-  "category": "developer-tools",
-  "tags": [
-    "automation",
-    "documentation",
-    "transcripts"
-  ],
+  "logo": "assets/logo.svg",
   "skills": "./skills/",
   "hooks": "./hooks/hooks.json"
 }
