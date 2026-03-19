@@ -15,7 +15,7 @@ const TRIAL_DEFAULT_MIN_MINUTES = 15;
 const TRIAL_DEFAULT_DURATION_MINUTES = 24 * 60;
 
 const FOLLOWUP_MESSAGE =
-  `Run the \`continuous-documentation\` skill now. Read the existing repository \`readme.md\` first. Use incremental transcript processing with index file \`${INCREMENTAL_INDEX_PATH}\`: only read transcripts not in the index or whose mtime is newer than indexed mtime. From the transcripts, identify documentation-worthy changes: new features, changed behavior, design decisions, architectural shifts, or updated business logic. Capture the intent and reasoning behind changes, not just what changed. Update \`readme.md\` following the documentation structure embedded in the skill. Strip all AI filler language. After processing, write back the updated index. If no meaningful documentation updates exist, respond exactly: No documentation updates needed.`;
+  `Run the \`continuous-documentation\` skill now. Read the existing \`readme.md\` first. Use two sources: (1) git log/diff since the last indexed commit to identify what changed in the code, (2) incremental transcript processing with index file \`${INCREMENTAL_INDEX_PATH}\` to understand why it changed. Correlate code changes with conversation intent. Update \`readme.md\` following the structure and slop filter embedded in the skill. After processing, write back the updated index with the latest commit SHA and transcript mtimes. If no meaningful documentation updates exist, respond exactly: No documentation updates needed.`;
 
 interface StopHookInput {
   conversation_id: string;

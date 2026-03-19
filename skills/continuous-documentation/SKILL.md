@@ -1,44 +1,66 @@
 ---
 name: continuous-documentation
-description: Incrementally update the repository README.md from transcript deltas, capturing intent and reasoning behind changes while following embedded documentation guidelines. Use when the hook triggers or the user asks to update documentation.
+description: Incrementally update the repository README.md by combining actual code changes (what) with conversation transcripts (why). Use when the hook triggers or the user asks to update documentation.
 ---
 
 # Continuous Documentation
 
-Keep the repository `readme.md` current using transcript deltas.
-This skill is self-contained — all documentation guidelines are embedded below. No external cursor rules are required.
+Keep the repository `readme.md` current using two sources of truth:
+- **Git** tells you what changed.
+- **Transcripts** tell you why it changed.
+
+Both matter equally. This skill is self-contained — all documentation guidelines are embedded below.
+
+## Core Principles
+
+### 1. What and Why are equally important
+
+"What" lives in the code — new files, changed signatures, added endpoints, altered domain logic. Use `git log` and `git diff` to find it.
+
+"Why" lives in the conversation — the user's stated reasoning, rejected alternatives, constraints that shaped the decision. Use transcripts to find it.
+
+A README entry that states what changed without why is a changelog line. A README entry that states why without what is an orphaned rationale. Neither is useful alone.
+
+### 2. What NOT to include is equally important as what to include
+
+Every section, sentence, and word must earn its place. If you cannot justify why a reader needs it, delete it. See the slop filter and exclusion rules below — they carry the same weight as the inclusion rules.
+
+---
 
 ## Inputs
 
-- Transcript root: `~/.cursor/projects/<workspace-slug>/agent-transcripts/`
-- Existing readme: `readme.md` (root for microservices, project-level for monoliths)
-- Incremental index: `.cursor/hooks/state/continuous-documentation-index.json`
+- **Git history**: `git log` and `git diff` since the last indexed commit (stored in incremental index).
+- **Transcripts**: `~/.cursor/projects/<workspace-slug>/agent-transcripts/`
+- **Existing readme**: `readme.md` (root for microservices, project-level for monoliths)
+- **Incremental index**: `.cursor/hooks/state/continuous-documentation-index.json`
 
 ## Workflow
 
-1. Read the existing `readme.md`.
-2. Determine the project type (Service, Monolith, UI, NuGet/NPM Package) from the repository structure and apply the matching README structure below.
-3. Load incremental index if present.
-4. Discover transcript files and process only:
-   - new files not in index, or
-   - files whose mtime is newer than indexed mtime.
-5. From each transcript, extract only documentation-worthy changes:
-   - new capabilities or features
-   - changed behavior or removed functionality
-   - design decisions and their rationale
-   - architectural shifts
-   - non-trivial business logic changes
-   - updated integration points or dependencies
-6. For each extracted change, capture **why** it was done — the intent, trade-offs considered, and constraints that led to the decision. Mine the conversation for this context; it is often stated by the user before or during the implementation.
-7. Update `readme.md`:
-   - modify existing sections in place when content has changed
-   - add new sections only when the structure calls for them
-   - remove content that is no longer accurate
-   - preserve the section structure for the detected project type
-8. Run the output through the slop filter (see below).
-9. Write back the incremental index:
-   - store latest mtimes for processed files
-   - remove entries for files that no longer exist
+1. **Read** the existing `readme.md`.
+2. **Determine project type** (Service, Monolith, UI, NuGet/NPM Package) from repository structure. Apply the matching README structure below.
+3. **Load** incremental index if present.
+4. **Gather what changed** (the What):
+   - Run `git log --oneline` from the last indexed commit to HEAD.
+   - For commits that touch documentation-relevant areas (new projects, changed domain/application layers, added endpoints, altered configuration), run `git diff` to understand the scope.
+   - Identify: new capabilities, changed behavior, removed functionality, new integration points, architectural shifts, non-trivial business logic changes.
+5. **Gather why it changed** (the Why):
+   - Discover transcript files and process only new or changed ones (mtime newer than indexed).
+   - From each transcript, extract stated reasoning: user-provided context, rejected alternatives, constraints, trade-offs, problem statements that prompted the change.
+   - Correlate transcript intent with the git changes from step 4. Match by timeframe and subject matter.
+6. **Merge What + Why** into README updates:
+   - For each documentation-worthy change, write what it is and why it was done.
+   - If the transcript provides no intent for a change, document the what only. Do not invent a why.
+   - If the transcript reveals intent but the code change is trivial, skip it — intent without a meaningful what is noise.
+7. **Update `readme.md`**:
+   - Modify existing sections in place when content has changed.
+   - Add new sections only when the structure calls for them.
+   - Remove content that is no longer accurate.
+   - Preserve the section structure for the detected project type.
+8. **Run the slop filter** on every sentence (see below).
+9. **Write back** the incremental index:
+   - Store latest commit SHA processed.
+   - Store latest transcript mtimes.
+   - Remove entries for transcripts that no longer exist.
 
 ---
 
@@ -139,7 +161,7 @@ Document NFRs only when they significantly impact design, operations, or user ex
 
 ## What Does NOT Belong in Documentation
 
-This list is as important as the one above.
+This list carries the same weight as the one above. Enforce it.
 
 - Restatements of what the code already says. If the function is `CalculateShippingCost`, do not document "calculates the shipping cost."
 - Implementation details that change frequently (file paths, class names, method signatures) unless they are public API surface.
@@ -147,6 +169,8 @@ This list is as important as the one above.
 - Auto-generated changelogs or version histories. The README is not a changelog.
 - Anything that only matters during a single sprint or PR cycle.
 - Internal ticket numbers, branch names, or developer names.
+- A "what" without substance. If the change is a routine refactor or rename, it does not belong in the README regardless of how many files it touched.
+- A "why" without a corresponding meaningful "what". Intent behind trivial changes is still trivial.
 
 ## Slop Filter
 
@@ -185,7 +209,7 @@ Every sentence in the output must pass this filter. Remove or rewrite any senten
 
 ## Capturing Intent
 
-When transcripts reveal why a change was made, distill it to a sentence or two in the relevant section. Good intent documentation reads like:
+When transcripts reveal why a change was made, distill it to a sentence or two in the relevant README section — placed next to the description of what changed. Good intent documentation reads like:
 
 - "Uses event sourcing instead of direct DB writes because order state must be auditable across services."
 - "Retry policy caps at 3 attempts with exponential backoff — chosen after observing transient Azure Service Bus timeouts under load."
@@ -204,7 +228,7 @@ If the transcript does not contain meaningful intent, do not invent it. Silence 
 Update the README only when all of these are true:
 
 - The change is user-facing, architecturally significant, or alters documented behavior.
-- The change is merged or committed (not speculative or abandoned).
+- The change is committed (not speculative or abandoned).
 - The existing README does not already accurately describe the current state.
 
 ## Exclusions
@@ -220,6 +244,7 @@ Never add to the README:
 ```json
 {
   "version": 1,
+  "lastCommitSha": "abc123...",
   "transcripts": {
     "/abs/path/to/file.jsonl": {
       "mtimeMs": 1730000000000,
