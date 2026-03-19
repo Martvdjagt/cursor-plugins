@@ -1,0 +1,25 @@
+{
+  "name": "continuous-documentation",
+  "displayName": "Continuous Documentation",
+  "version": "1.0.0",
+  "description": "Keeps repository README.md current by mining conversation transcripts for documentation-worthy changes, capturing intent and reasoning behind decisions.",
+  "author": {
+    "name": "mvanderjagt"
+  },
+  "license": "MIT",
+  "keywords": [
+    "continuous-documentation",
+    "readme",
+    "transcripts",
+    "hooks",
+    "incremental"
+  ],
+  "category": "developer-tools",
+  "tags": [
+    "automation",
+    "documentation",
+    "transcripts"
+  ],
+  "skills": "./skills/",
+  "hooks": "./hooks/hooks.json"
+}
